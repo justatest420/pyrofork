@@ -25,6 +25,11 @@ from pyrogram import types
 from ..object import Object
 
 
+style_map = {
+    "red": "danger",
+    "green": "success",
+    "blue": "primary"
+}
 class InlineKeyboardButton(Object):
     """One button of an inline keyboard.
 
@@ -33,7 +38,9 @@ class InlineKeyboardButton(Object):
     Parameters:
         text (``str``):
             Label text on the button.
-
+        style (``str`` | None):
+           Optional. Style of the button. Must be one of ‘danger’ (red), ‘success’ (green) or ‘primary’ (blue). If omitted, then an app-specific style is used.
+           
         callback_data (``str`` | ``bytes``, *optional*):
             Data to be sent in a callback query to the bot when button is pressed, 1-64 bytes.
 
@@ -81,6 +88,7 @@ class InlineKeyboardButton(Object):
     def __init__(
         self,
         text: str,
+        style: Optional[str] = None,
         callback_data: Optional[Union[str, bytes]] = None,
         url: Optional[str] = None,
         web_app: Optional["types.WebAppInfo"] = None,
@@ -104,6 +112,7 @@ class InlineKeyboardButton(Object):
         self.switch_inline_query_current_chat = switch_inline_query_current_chat
         self.callback_game = callback_game
         self.requires_password = requires_password
+        self.style = style
         # self.pay = pay
         self.copy_text = copy_text
 
