@@ -16,84 +16,118 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with Pyrogram.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Optional
+from typing import Union, Optional
 
-from pyrogram import enums, raw, types
-
+import pyrogram
+from pyrogram import raw
+from pyrogram import types
+from pyrogram import enums
 from ..object import Object
 
 
-class KeyboardButton(Object):
-    """One button of the reply keyboard.
+class InlineKeyboardButton(Object):
+    """One button of an inline keyboard.
 
-    For simple text buttons String can be used instead of this object to specify text of the button.
-    Optional fields are mutually exclusive.
+    You must use exactly one of the optional fields.
 
     Parameters:
         text (``str``):
-            Text of the button. If none of the optional fields are used, it will be sent as a message when
-            the button is pressed.
+            Label text on the button.
+
+        callback_data (``str`` | ``bytes``, *optional*):
+            Data to be sent in a callback query to the bot when button is pressed, 1-64 bytes.
+
+        url (``str``, *optional*):
+            HTTP url to be opened when button is pressed.
+
+        web_app (:obj:`~pyrogram.types.WebAppInfo`, *optional*):
+            Description of the `Web App <https://core.telegram.org/bots/webapps>`_ that will be launched when the user
+            presses the button. The Web App will be able to send an arbitrary message on behalf of the user using the
+            method :meth:`~pyrogram.Client.answer_web_app_query`. Available only in private chats between a user and the
+            bot.
+
+        login_url (:obj:`~pyrogram.types.LoginUrl`, *optional*):
+             An HTTP URL used to automatically authorize the user. Can be used as a replacement for
+             the `Telegram Login Widget <https://core.telegram.org/widgets/login>`_.
+
+        user_id (``int``, *optional*):
+            User id, for links to the user profile.
+
+        switch_inline_query (``str``, *optional*):
+            If set, pressing the button will prompt the user to select one of their chats, open that chat and insert
+            the bot's username and the specified inline query in the input field. Can be empty, in which case just
+            the bot's username will be inserted.Note: This offers an easy way for users to start using your bot in
+            inline mode when they are currently in a private chat with it. Especially useful when combined with
+            switch_pm… actions – in this case the user will be automatically returned to the chat they switched from,
+            skipping the chat selection screen.
+
+        switch_inline_query_current_chat (``str``, *optional*):
+            If set, pressing the button will insert the bot's username and the specified inline query in the current
+            chat's input field. Can be empty, in which case only the bot's username will be inserted.This offers a
+            quick way for the user to open your bot in inline mode in the same chat – good for selecting something
+            from multiple options.
+
+        callback_game (:obj:`~pyrogram.types.CallbackGame`, *optional*):
+            Description of the game that will be launched when the user presses the button.
+            **NOTE**: This type of button **must** always be the first button in the first row.
+
+        callback_data_with_password (``bytes``, *optional*):
+            A button that asks for the 2-step verification password of the current user and then sends a callback query to a bot Data to be sent to the bot via a callback query.
+
+        pay (``bool``, *optional*):
+            Pass True, to send a Pay button.
+            Substrings `⭐` and `XTR` in the buttons's text will be replaced with a Telegram Star icon.
+            Available in :meth:`~pyrogram.Client.send_invoice`.
+
+            **NOTE**: This type of button **must** always be the first button in the first row and can only be used in invoice messages.
+
+        copy_text (``str``, *optional*):
+            A button that copies specified text to clipboard.
+            Limited to 256 character.
 
         icon_custom_emoji_id (``str``, *optional*):
             Identifier of the custom emoji that must be shown on the button.
 
         style (:obj:`~pyrogram.enums.ButtonStyle`, *optional*):
             Style of the button.
-
-        request_contact (``bool``, *optional*):
-            If True, the user's phone number will be sent as a contact when the button is pressed.
-            Available in private chats only.
-
-        request_location (``bool``, *optional*):
-            If True, the user's current location will be sent when the button is pressed.
-            Available in private chats only.
-
-        request_poll (:obj:`~pyrogram.types.KeyboardButtonPollType`, *optional*):
-            If specified, the user will be asked to create a poll and send it to the bot when the button is pressed.
-            Available in private chats only.
-
-        request_users (:obj:`~pyrogram.types.KeyboardButtonRequestUsers`, *optional*):
-            If specified, pressing the button will open a list of suitable users.
-            Identifiers of selected users will be sent to the bot in a `users_shared` service message.
-            Available in private chats only.
-
-        request_chat (:obj:`~pyrogram.types.KeyboardButtonRequestChat`, *optional*):
-            If specified, pressing the button will open a list of suitable chats.
-            Tapping on a chat will send its identifier to the bot in a `chat_shared` service message.
-            Available in private chats only.
-
-        web_app (:obj:`~pyrogram.types.WebAppInfo`, *optional*):
-            If specified, the described `Web App <https://core.telegram.org/bots/webapps>`_ will be launched when the
-            button is pressed.
-            The Web App will be able to send a `web_app_data` service message.
-            Available in private chats only.
     """
+
     def __init__(
         self,
         text: str,
-        icon_custom_emoji_id: Optional[str] = None,
-        style: "enums.ButtonStyle" = enums.ButtonStyle.DEFAULT,
-        request_contact: Optional[bool] = None,
-        request_location: Optional[bool] = None,
-        request_poll: Optional["types.KeyboardButtonPollType"] = None,
-        request_users: Optional["types.KeyboardButtonRequestUsers"] = None,
-        request_chat: Optional["types.KeyboardButtonRequestChat"] = None,
+        callback_data: Optional[Union[str, bytes]] = None,
+        url: Optional[str] = None,
         web_app: Optional["types.WebAppInfo"] = None,
+        login_url: Optional["types.LoginUrl"] = None,
+        user_id: Optional[int] = None,
+        switch_inline_query: Optional[str] = None,
+        switch_inline_query_current_chat: Optional[str] = None,
+        callback_game: Optional["types.CallbackGame"] = None,
+        requires_password: Optional[bool] = None,
+        pay: Optional[bool] = None,
+        copy_text: Optional[str] = None,
+        icon_custom_emoji_id: Optional[str] = None,
+        style: "enums.ButtonStyle" = enums.ButtonStyle.DEFAULT
     ):
         super().__init__()
 
         self.text = str(text)
+        self.callback_data = callback_data
+        self.url = url
+        self.web_app = web_app
+        self.login_url = login_url
+        self.user_id = user_id
+        self.switch_inline_query = switch_inline_query
+        self.switch_inline_query_current_chat = switch_inline_query_current_chat
+        self.callback_game = callback_game
+        self.requires_password = requires_password
+        self.pay = pay
+        self.copy_text = copy_text
         self.icon_custom_emoji_id = icon_custom_emoji_id
         self.style = style
-        self.request_contact = request_contact
-        self.request_location = request_location
-        self.request_poll = request_poll
-        self.request_users = request_users
-        self.request_chat = request_chat
-        self.web_app = web_app
 
     @staticmethod
-    def read(b):
+    def read(b: "raw.base.KeyboardButton"):
         raw_style: "raw.types.KeyboardButtonStyle" = getattr(b, "style", None)
         button_style = enums.ButtonStyle.DEFAULT
         icon_custom_emoji_id = None
@@ -108,89 +142,104 @@ class KeyboardButton(Object):
             elif raw_style.icon:
                 icon_custom_emoji_id = str(raw_style.icon)
 
-        if isinstance(b, raw.types.KeyboardButton):
-            return KeyboardButton(
+        if isinstance(b, raw.types.KeyboardButtonCallback):
+            # Try decode data to keep it as string, but if fails, fallback to bytes so we don't lose any information,
+            # instead of decoding by ignoring/replacing errors.
+            try:
+                data = b.data.decode()
+            except UnicodeDecodeError:
+                data = b.data
+
+            return InlineKeyboardButton(
                 text=b.text,
+                callback_data=data,
+                requires_password=getattr(b, "requires_password", None),
                 style=button_style,
                 icon_custom_emoji_id=icon_custom_emoji_id
             )
 
-        if isinstance(b, raw.types.KeyboardButtonRequestPhone):
-            return KeyboardButton(
+        if isinstance(b, raw.types.KeyboardButtonUrl):
+            return InlineKeyboardButton(
                 text=b.text,
-                request_contact=True,
+                url=b.url,
                 style=button_style,
                 icon_custom_emoji_id=icon_custom_emoji_id
             )
 
-        if isinstance(b, raw.types.KeyboardButtonRequestGeoLocation):
-            return KeyboardButton(
+        if isinstance(b, raw.types.KeyboardButtonUrlAuth):
+            return InlineKeyboardButton(
                 text=b.text,
-                request_location=True,
+                login_url=types.LoginUrl.read(b),
                 style=button_style,
                 icon_custom_emoji_id=icon_custom_emoji_id
             )
 
-        if isinstance(b, raw.types.KeyboardButtonRequestPoll):
-            return KeyboardButton(
+        if isinstance(b, raw.types.KeyboardButtonUserProfile):
+            return InlineKeyboardButton(
                 text=b.text,
-                request_poll=types.KeyboardButtonPollType(is_quiz=b.quiz),
+                user_id=b.user_id,
                 style=button_style,
                 icon_custom_emoji_id=icon_custom_emoji_id
             )
 
-        if isinstance(b, raw.types.KeyboardButtonRequestPeer):
-            if isinstance(b.peer_type, (raw.types.RequestPeerTypeBroadcast, raw.types.RequestPeerTypeChat)):
-                user_privileges = getattr(b.peer_type, "user_admin_rights", None)
-                bot_privileges = getattr(b.peer_type, "bot_admin_rights", None)
-
-                return KeyboardButton(
+        if isinstance(b, raw.types.KeyboardButtonSwitchInline):
+            if b.same_peer:
+                return InlineKeyboardButton(
                     text=b.text,
+                    switch_inline_query_current_chat=b.query,
                     style=button_style,
-                    icon_custom_emoji_id=icon_custom_emoji_id,
-                    request_chat=types.KeyboardButtonRequestChat(
-                        button_id=b.button_id,
-                        chat_is_channel=isinstance(b.peer_type, raw.types.RequestPeerTypeBroadcast),
-                        chat_is_created=getattr(b.peer_type, "creator", None),
-                        bot_is_member=getattr(b.peer_type, "bot_participant", None),
-                        chat_has_username=getattr(b.peer_type, "has_username", None),
-                        chat_is_forum=getattr(b.peer_type, "forum", None),
-                        user_administrator_rights=types.ChatAdministratorRights._parse(user_privileges),
-                        bot_administrator_rights=types.ChatAdministratorRights._parse(bot_privileges),
-                        request_title = getattr(b, "name_requested", None),
-                        request_username = getattr(b, "username_requested", None),
-                        request_photo = getattr(b, "photo_requested", None),
-                        max_quantity = getattr(b, "max_quantity", None),
-                    )
+                    icon_custom_emoji_id=icon_custom_emoji_id
+                )
+            else:
+                return InlineKeyboardButton(
+                    text=b.text,
+                    switch_inline_query=b.query,
+                    style=button_style,
+                    icon_custom_emoji_id=icon_custom_emoji_id
                 )
 
-            if isinstance(b.peer_type, raw.types.RequestPeerTypeUser):
-                return KeyboardButton(
-                    text=b.text,
-                    style=button_style,
-                    icon_custom_emoji_id=icon_custom_emoji_id,
-                    request_users=types.KeyboardButtonRequestUsers(
-                        button_id=b.button_id,
-                        user_is_bot=getattr(b.peer_type, "bot", None),
-                        user_is_premium=getattr(b.peer_type, "premium", None),
-                        request_name=getattr(b, "name_requested", None),
-                        request_username=getattr(b, "username_requested", None),
-                        request_photo=getattr(b, "photo_requested", None),
-                        max_quantity = getattr(b, "max_quantity", None),
-                    )
-                )
-
-        if isinstance(b, raw.types.KeyboardButtonSimpleWebView):
-            return KeyboardButton(
+        if isinstance(b, raw.types.KeyboardButtonGame):
+            return InlineKeyboardButton(
                 text=b.text,
+                callback_game=types.CallbackGame(),
                 style=button_style,
-                icon_custom_emoji_id=icon_custom_emoji_id,
+                icon_custom_emoji_id=icon_custom_emoji_id
+            )
+
+        if isinstance(b, raw.types.KeyboardButtonWebView):
+            return InlineKeyboardButton(
+                text=b.text,
                 web_app=types.WebAppInfo(
                     url=b.url
-                )
+                ),
+                style=button_style,
+                icon_custom_emoji_id=icon_custom_emoji_id
             )
 
-    def write(self):
+        if isinstance(b, raw.types.KeyboardButtonBuy):
+            return InlineKeyboardButton(
+                text=b.text,
+                pay=True,
+                style=button_style,
+                icon_custom_emoji_id=icon_custom_emoji_id
+            )
+
+        if isinstance(b, raw.types.KeyboardButtonCopy):
+            return InlineKeyboardButton(
+                text=b.text,
+                copy_text=b.copy_text,
+                style=button_style,
+                icon_custom_emoji_id=icon_custom_emoji_id
+            )
+
+        if isinstance(b, raw.types.KeyboardButton):
+            return InlineKeyboardButton(
+                text=b.text,
+                style=button_style,
+                icon_custom_emoji_id=icon_custom_emoji_id
+            )
+
+    async def write(self, client: "pyrogram.Client"):
         style = raw.types.KeyboardButtonStyle(
             bg_primary=self.style == enums.ButtonStyle.PRIMARY,
             bg_danger=self.style == enums.ButtonStyle.DANGER,
@@ -198,101 +247,75 @@ class KeyboardButton(Object):
             icon=int(self.icon_custom_emoji_id) if self.icon_custom_emoji_id is not None else None
         ) if self.style != enums.ButtonStyle.DEFAULT or self.icon_custom_emoji_id is not None else None
 
-        if self.request_contact:
-            return raw.types.KeyboardButtonRequestPhone(
+        if self.callback_data is not None:
+            # Telegram only wants bytes, but we are allowed to pass strings too, for convenience.
+            data = bytes(self.callback_data, "utf-8") if isinstance(self.callback_data, str) else self.callback_data
+
+            return raw.types.KeyboardButtonCallback(
+                text=self.text,
+                data=data,
+                requires_password=self.requires_password,
+                style=style,
+            )
+
+        if self.url is not None:
+            return raw.types.KeyboardButtonUrl(
+                text=self.text,
+                url=self.url,
+                style=style,
+            )
+
+        if self.login_url is not None:
+            return self.login_url.write(
+                text=self.text,
+                bot=await client.resolve_peer(self.login_url.bot_username or "self"),
+                style=style,
+            )
+
+        if self.user_id is not None:
+            return raw.types.InputKeyboardButtonUserProfile(
+                text=self.text,
+                user_id=await client.resolve_peer(self.user_id),
+                style=style,
+            )
+
+        if self.switch_inline_query is not None:
+            return raw.types.KeyboardButtonSwitchInline(
+                text=self.text,
+                query=self.switch_inline_query,
+                style=style,
+            )
+
+        if self.switch_inline_query_current_chat is not None:
+            return raw.types.KeyboardButtonSwitchInline(
+                text=self.text,
+                query=self.switch_inline_query_current_chat,
+                same_peer=True,
+                style=style,
+            )
+
+        if self.callback_game is not None:
+            return raw.types.KeyboardButtonGame(
                 text=self.text,
                 style=style,
             )
-        elif self.request_location:
-            return raw.types.KeyboardButtonRequestGeoLocation(text=self.text, style=style)
-        elif self.request_poll:
-            return raw.types.KeyboardButtonRequestPoll(
+
+        if self.web_app is not None:
+            return raw.types.KeyboardButtonWebView(
                 text=self.text,
-                quiz=self.request_poll.is_quiz,
-                style=style
-            )
-        elif self.request_chat:
-            user_privileges = self.request_chat.user_administrator_rights
-            bot_privileges = self.request_chat.bot_administrator_rights
-
-            user_admin_rights = raw.types.ChatAdminRights(
-                change_info=user_privileges.can_change_info,
-                post_messages=user_privileges.can_post_messages,
-                post_stories=user_privileges.can_post_stories,
-                edit_messages=user_privileges.can_edit_messages,
-                edit_stories=user_privileges.can_post_stories,
-                delete_messages=user_privileges.can_delete_messages,
-                delete_stories=user_privileges.can_delete_stories,
-                ban_users=user_privileges.can_restrict_members,
-                invite_users=user_privileges.can_invite_users,
-                pin_messages=user_privileges.can_pin_messages,
-                add_admins=user_privileges.can_promote_members,
-                anonymous=user_privileges.is_anonymous,
-                manage_call=user_privileges.can_manage_video_chats,
-                other=user_privileges.can_manage_chat
-            ) if user_privileges else None
-
-            bot_admin_rights = raw.types.ChatAdminRights(
-                change_info=bot_privileges.can_change_info,
-                post_messages=bot_privileges.can_post_messages,
-                post_stories=bot_privileges.can_post_stories,
-                edit_messages=bot_privileges.can_edit_messages,
-                edit_stories=bot_privileges.can_post_stories,
-                delete_messages=bot_privileges.can_delete_messages,
-                delete_stories=bot_privileges.can_delete_stories,
-                ban_users=bot_privileges.can_restrict_members,
-                invite_users=bot_privileges.can_invite_users,
-                pin_messages=bot_privileges.can_pin_messages,
-                add_admins=bot_privileges.can_promote_members,
-                anonymous=bot_privileges.is_anonymous,
-                manage_call=bot_privileges.can_manage_video_chats,
-                other=bot_privileges.can_manage_chat
-            ) if bot_privileges else None
-
-            if self.request_chat.chat_is_channel:
-                peer_type = raw.types.RequestPeerTypeBroadcast(
-                    creator=self.request_chat.chat_is_created,
-                    has_username=self.request_chat.chat_has_username,
-                    user_admin_rights=user_admin_rights,
-                    bot_admin_rights=bot_admin_rights
-                )
-            else:
-                peer_type = raw.types.RequestPeerTypeChat(
-                    creator=self.request_chat.chat_is_created,
-                    bot_participant=self.request_chat.bot_is_member,
-                    has_username=self.request_chat.chat_has_username,
-                    forum=self.request_chat.chat_is_forum,
-                    user_admin_rights=user_admin_rights,
-                    bot_admin_rights=bot_admin_rights
-                )
-
-            return raw.types.InputKeyboardButtonRequestPeer(
-                text=self.text,
-                button_id=self.request_chat.button_id,
-                peer_type=peer_type,
-                max_quantity=self.request_chat.max_quantity,
-                name_requested=self.request_chat.request_title,
-                username_requested=self.request_chat.request_username,
-                photo_requested=self.request_chat.request_photo,
+                url=self.web_app.url,
                 style=style,
             )
-        elif self.request_users:
-            peer_type = raw.types.RequestPeerTypeUser(
-                bot=self.request_users.user_is_bot,
-                premium=self.request_users.user_is_premium
-            )
 
-            return raw.types.InputKeyboardButtonRequestPeer(
+        if self.pay is not None:
+            return raw.types.KeyboardButtonBuy(
                 text=self.text,
-                button_id=self.request_users.button_id,
-                peer_type=peer_type,
-                max_quantity=self.request_users.max_quantity,
-                name_requested=self.request_users.request_name,
-                username_requested=self.request_users.request_username,
-                photo_requested=self.request_users.request_photo,
                 style=style,
             )
-        elif self.web_app:
-            return raw.types.KeyboardButtonSimpleWebView(text=self.text, url=self.web_app.url, style=style)
-        else:
-            return raw.types.KeyboardButton(text=self.text, style=style)
+
+        if self.copy_text is not None:
+            return raw.types.KeyboardButtonCopy(
+                text=self.text,
+                copy_text=self.copy_text,
+                style=style,
+            )
