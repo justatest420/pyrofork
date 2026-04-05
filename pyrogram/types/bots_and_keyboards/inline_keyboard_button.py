@@ -25,11 +25,6 @@ from pyrogram import types
 from ..object import Object
 
 
-style_map = {
-    "red": "danger",
-    "green": "success",
-    "blue": "primary"
-}
 class InlineKeyboardButton(Object):
     """One button of an inline keyboard.
 
@@ -39,7 +34,8 @@ class InlineKeyboardButton(Object):
         text (``str``):
             Label text on the button.
         style (``str`` | None):
-           Optional. Style of the button. Must be one of ‘danger’ (red), ‘success’ (green) or ‘primary’ (blue). If omitted, then an app-specific style is used.
+           Optional. Style of the button. Must be one of 'danger' (red), 'success' (green) or 'primary' (blue). 
+           You can also use color names: 'red', 'green', 'blue'. If omitted, then an app-specific style is used.
            
         callback_data (``str`` | ``bytes``, *optional*):
             Data to be sent in a callback query to the bot when button is pressed, 1-64 bytes.
@@ -85,6 +81,16 @@ class InlineKeyboardButton(Object):
             A button that copies the text to the clipboard.
     """
 
+    # Style mapping for different color options
+    _STYLE_MAP = {
+        "red": "danger",
+        "green": "success", 
+        "blue": "primary",
+        "danger": "danger",
+        "success": "success",
+        "primary": "primary"
+    }
+
     def __init__(
         self,
         text: str,
@@ -112,9 +118,63 @@ class InlineKeyboardButton(Object):
         self.switch_inline_query_current_chat = switch_inline_query_current_chat
         self.callback_game = callback_game
         self.requires_password = requires_password
-        self.style = style
-        # self.pay = pay
         self.copy_text = copy_text
+        
+        # Process and validate style
+        self._style = None
+        if style:
+            style_lower = style.lower()
+            if style_lower in self._STYLE_MAP:
+                self._style = self._STYLE_MAP[style_lower]
+            else:
+                raise ValueError(f"Invalid style '{style}'. Must be one of: {list(self._STYLE_MAP.keys())}")
+
+    @property
+    def style(self) -> Optional[str]:
+        """Get the button style."""
+        return self._style
+
+    @style.setter
+    def style(self, value: Optional[str]):
+        """Set the button style with validation."""
+        if value is None:
+            self._style = None
+            return
+            
+        value_lower = value.lower()
+        if value_lower in self._STYLE_MAP:
+            self._style = self._STYLE_MAP[value_lower]
+        else:
+            raise ValueError(f"Invalid style '{value}'. Must be one of: {list(self._STYLE_MAP.keys())}")
+
+    def to_dict(self) -> dict:
+        """Convert button to dictionary representation including style."""
+        button_dict = {
+            "text": self.text,
+            "style": self.style
+        }
+        
+        # Add the action type and its data
+        if self.callback_data is not None:
+            button_dict["callback_data"] = self.callback_data
+        elif self.url is not None:
+            button_dict["url"] = self.url
+        elif self.web_app is not None:
+            button_dict["web_app"] = self.web_app.to_dict() if self.web_app else None
+        elif self.login_url is not None:
+            button_dict["login_url"] = self.login_url.to_dict() if self.login_url else None
+        elif self.user_id is not None:
+            button_dict["user_id"] = self.user_id
+        elif self.switch_inline_query is not None:
+            button_dict["switch_inline_query"] = self.switch_inline_query
+        elif self.switch_inline_query_current_chat is not None:
+            button_dict["switch_inline_query_current_chat"] = self.switch_inline_query_current_chat
+        elif self.callback_game is not None:
+            button_dict["callback_game"] = self.callback_game.to_dict() if self.callback_game else None
+        elif self.copy_text is not None:
+            button_dict["copy_text"] = self.copy_text
+            
+        return button_dict
 
     @staticmethod
     def read(b: "raw.base.KeyboardButton"):
